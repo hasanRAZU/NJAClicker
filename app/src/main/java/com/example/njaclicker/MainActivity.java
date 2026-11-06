@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.njaclicker.accessibility.AutoClickAccessibilityService;
+
 public class MainActivity extends Activity {
 
     private TextView tvServiceStatus;
