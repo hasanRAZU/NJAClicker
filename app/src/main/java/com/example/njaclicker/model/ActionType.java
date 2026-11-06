@@ -1,4 +1,6 @@
 package com.example.njaclicker.model;
 
-public class ActionType {
+public enum ActionType {
+    TAP,
+    SWIPE
 }
