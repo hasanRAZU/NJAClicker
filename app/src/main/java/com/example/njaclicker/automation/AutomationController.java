@@ -22,8 +22,8 @@ public class AutomationController {
     private int currentIndex = 0;
 
     private boolean isRunning = false;
+    private boolean repeatEnabled = false;
 
-    // Identifies the current execution session.
     private int sessionId = 0;
 
     private ControllerListener listener;
@@ -47,22 +47,34 @@ public class AutomationController {
         this.listener = listener;
     }
 
-    // Start or restart the automation sequence.
+    // =====================================
+    // START WITHOUT REPEAT
+    // =====================================
+
     public void start(List<AutomationAction> actionList) {
+        start(actionList, false);
+    }
+
+    // =====================================
+    // START WITH REPEAT OPTION
+    // =====================================
+
+    public void start(
+            List<AutomationAction> actionList,
+            boolean repeat
+    ) {
 
         if (actionList == null || actionList.isEmpty()) {
-
             notifyError("No actions available.");
             return;
         }
 
         stop();
 
-        // Copy the list to protect the running sequence
-        // from changes to the original list structure.
         actions = new ArrayList<>(actionList);
 
         currentIndex = 0;
+        repeatEnabled = repeat;
         isRunning = true;
 
         final int currentSession = sessionId;
@@ -70,19 +82,29 @@ public class AutomationController {
         executeCurrentAction(currentSession);
     }
 
+    // =====================================
+    // EXECUTE CURRENT ACTION
+    // =====================================
+
     private void executeCurrentAction(int currentSession) {
 
         if (!isRunning || currentSession != sessionId) {
             return;
         }
 
-        if (actions.isEmpty()) {
-            stop();
-            return;
-        }
-
+        // End of sequence
         if (currentIndex >= actions.size()) {
-            currentIndex = 0;
+
+            if (repeatEnabled) {
+
+                // Start again from the first action
+                currentIndex = 0;
+
+            } else {
+
+                stop();
+                return;
+            }
         }
 
         final int actionIndex = currentIndex;
@@ -90,7 +112,9 @@ public class AutomationController {
         AutomationAction action = actions.get(actionIndex);
 
         if (action == null) {
-            handleError("Invalid action at position " + (actionIndex + 1));
+            handleError(
+                    "Invalid action at position " + (actionIndex + 1)
+            );
             return;
         }
 
@@ -114,10 +138,9 @@ public class AutomationController {
                             listener.onActionCompleted(actionIndex);
                         }
 
-                        // Move to the next action.
                         currentIndex++;
 
-                        // Wait for this action's own delay.
+                        // Each action has its own delay.
                         long delay = Math.max(
                                 0,
                                 action.getDelayAfterMs()
@@ -155,27 +178,35 @@ public class AutomationController {
                 isRunning &&
                 currentSession == sessionId) {
 
-            handleError("Android rejected the gesture request.");
+            handleError(
+                    "Android rejected the gesture request."
+            );
         }
     }
 
-    // Stop future actions.
+    // =====================================
+    // STOP
+    // =====================================
+
     public void stop() {
 
         boolean wasRunning = isRunning;
 
         isRunning = false;
+        repeatEnabled = false;
 
-        // Invalidate callbacks from the previous session.
         sessionId++;
 
-        // Remove pending delays.
         handler.removeCallbacksAndMessages(null);
 
         if (wasRunning && listener != null) {
             listener.onStopped();
         }
     }
+
+    // =====================================
+    // ERROR HANDLING
+    // =====================================
 
     private void handleError(String message) {
 
@@ -191,8 +222,16 @@ public class AutomationController {
         }
     }
 
+    // =====================================
+    // GETTERS
+    // =====================================
+
     public boolean isRunning() {
         return isRunning;
+    }
+
+    public boolean isRepeatEnabled() {
+        return repeatEnabled;
     }
 
     public int getCurrentIndex() {
