@@ -99,7 +99,7 @@ public class FloatingPanel {
                 AccessibilityService.WINDOW_SERVICE
         );
 
-        panelWidth = dp(290);
+        panelWidth = dp(250);
 
         createPanel();
         createBubble();
@@ -109,7 +109,7 @@ public class FloatingPanel {
 
         rootLayout = new LinearLayout(service);
         rootLayout.setOrientation(LinearLayout.VERTICAL);
-        rootLayout.setPadding(dp(10), dp(8), dp(10), dp(10));
+        rootLayout.setPadding(dp(6), dp(5), dp(6), dp(6));
         rootLayout.setBackground(createBackground());
 
         // Header
@@ -126,7 +126,7 @@ public class FloatingPanel {
 
         headerRow.addView(
                 header,
-                new LinearLayout.LayoutParams(0, dp(42), 1)
+                new LinearLayout.LayoutParams(0, dp(34), 1)
         );
 
         Button minimizeButton = createButton("−");
@@ -135,7 +135,7 @@ public class FloatingPanel {
 
         headerRow.addView(
                 minimizeButton,
-                new LinearLayout.LayoutParams(dp(44), dp(40))
+                new LinearLayout.LayoutParams(dp(36), dp(32))
         );
 
         rootLayout.addView(headerRow);
@@ -205,7 +205,7 @@ public class FloatingPanel {
 
         content.addView(
                 tapScroll,
-                new LinearLayout.LayoutParams(-1, dp(105))
+                new LinearLayout.LayoutParams(-1, dp(65))
         );
 
         // Swipe actions section
@@ -218,7 +218,7 @@ public class FloatingPanel {
 
         content.addView(
                 swipeScroll,
-                new LinearLayout.LayoutParams(-1, dp(105))
+                new LinearLayout.LayoutParams(-1, dp(65))
         );
 
         // Repeat checkbox
@@ -310,7 +310,7 @@ public class FloatingPanel {
 
         rootLayout.addView(
                 mainScroll,
-                new LinearLayout.LayoutParams(-1, dp(390))
+                new LinearLayout.LayoutParams(-1, dp(260))
         );
 
         params = new WindowManager.LayoutParams(
@@ -394,8 +394,8 @@ public class FloatingPanel {
         bubbleView.setElevation(dp(10));
 
         bubbleParams = new WindowManager.LayoutParams(
-                dp(56),
-                dp(56),
+                dp(48),
+                dp(48),
                 WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
@@ -678,9 +678,9 @@ public class FloatingPanel {
                 .setPositiveButton("Save", null)
                 .create();
 
-        dialog.setOnShowListener(d -> {
+        configureDialogWindow(dialog);
 
-            configureDialogWindow(dialog);
+        dialog.setOnShowListener(d -> {
 
             dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     .setOnClickListener(v -> {
@@ -775,9 +775,9 @@ public class FloatingPanel {
                 .setPositiveButton("Save", null)
                 .create();
 
-        dialog.setOnShowListener(d -> {
+        configureDialogWindow(dialog);
 
-            configureDialogWindow(dialog);
+        dialog.setOnShowListener(d -> {
 
             dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     .setOnClickListener(v -> {
@@ -837,10 +837,11 @@ public class FloatingPanel {
                 .setNegativeButton("Cancel", null)
                 .create();
 
-        dialog.setOnShowListener(d -> configureDialogWindow(dialog));
+        configureDialogWindow(dialog);
 
         dialog.show();
     }
+
 
     private void configureDialogWindow(AlertDialog dialog) {
 
@@ -848,6 +849,7 @@ public class FloatingPanel {
 
         if (window != null) {
 
+            // Set the correct window type BEFORE dialog.show().
             window.setType(
                     WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
             );
@@ -857,10 +859,11 @@ public class FloatingPanel {
             );
 
             window.setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+                    WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
             );
         }
     }
+
 
     public void setRunning(boolean running) {
 
@@ -999,9 +1002,9 @@ public class FloatingPanel {
     private LinearLayout.LayoutParams fullWidthButtonParams() {
 
         LinearLayout.LayoutParams buttonParams =
-                new LinearLayout.LayoutParams(-1, dp(42));
+                new LinearLayout.LayoutParams(-1, dp(32));
 
-        buttonParams.setMargins(0, dp(3), 0, dp(3));
+        buttonParams.setMargins(0, dp(1), 0, dp(1));
 
         return buttonParams;
     }

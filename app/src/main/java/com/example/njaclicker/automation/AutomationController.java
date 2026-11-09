@@ -47,17 +47,9 @@ public class AutomationController {
         this.listener = listener;
     }
 
-    // =====================================
-    // START WITHOUT REPEAT
-    // =====================================
-
     public void start(List<AutomationAction> actionList) {
         start(actionList, false);
     }
-
-    // =====================================
-    // START WITH REPEAT OPTION
-    // =====================================
 
     public void start(
             List<AutomationAction> actionList,
@@ -79,12 +71,12 @@ public class AutomationController {
 
         final int currentSession = sessionId;
 
-        executeCurrentAction(currentSession);
+        // Wait 1 second before executing the first action.
+        handler.postDelayed(
+                () -> executeCurrentAction(currentSession),
+                1000
+        );
     }
-
-    // =====================================
-    // EXECUTE CURRENT ACTION
-    // =====================================
 
     private void executeCurrentAction(int currentSession) {
 
@@ -92,16 +84,11 @@ public class AutomationController {
             return;
         }
 
-        // End of sequence
         if (currentIndex >= actions.size()) {
 
             if (repeatEnabled) {
-
-                // Start again from the first action
                 currentIndex = 0;
-
             } else {
-
                 stop();
                 return;
             }
@@ -140,7 +127,7 @@ public class AutomationController {
 
                         currentIndex++;
 
-                        // Each action has its own delay.
+                        // Keep the individual delay for each action.
                         long delay = Math.max(
                                 0,
                                 action.getDelayAfterMs()
@@ -157,7 +144,6 @@ public class AutomationController {
 
                         if (isRunning &&
                                 currentSession == sessionId) {
-
                             handleError("Gesture was cancelled.");
                         }
                     }
@@ -167,7 +153,6 @@ public class AutomationController {
 
                         if (isRunning &&
                                 currentSession == sessionId) {
-
                             handleError("Unable to perform gesture.");
                         }
                     }
@@ -183,10 +168,6 @@ public class AutomationController {
             );
         }
     }
-
-    // =====================================
-    // STOP
-    // =====================================
 
     public void stop() {
 
@@ -204,14 +185,8 @@ public class AutomationController {
         }
     }
 
-    // =====================================
-    // ERROR HANDLING
-    // =====================================
-
     private void handleError(String message) {
-
         stop();
-
         notifyError(message);
     }
 
@@ -221,10 +196,6 @@ public class AutomationController {
             listener.onError(message);
         }
     }
-
-    // =====================================
-    // GETTERS
-    // =====================================
 
     public boolean isRunning() {
         return isRunning;
