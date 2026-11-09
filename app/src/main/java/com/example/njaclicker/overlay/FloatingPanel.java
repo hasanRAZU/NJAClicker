@@ -86,6 +86,8 @@ public class FloatingPanel {
 
         default void onLoadRequested(String name) {
         }
+        default void onDeleteRequested(String name) {
+        }
     }
 
     public FloatingPanel(
@@ -244,6 +246,13 @@ public class FloatingPanel {
         loadButton.setOnClickListener(v -> showLoadDialog());
 
         content.addView(loadButton, fullWidthButtonParams());
+
+        // Delete configuration
+        Button deleteButton = createButton("Delete Configuration");
+
+        deleteButton.setOnClickListener(v -> showDeleteDialog());
+
+        content.addView(deleteButton, fullWidthButtonParams());
 
         // Remove last action
         Button removeLastButton = createButton("Remove Last Action");
@@ -842,6 +851,81 @@ public class FloatingPanel {
         dialog.show();
     }
 
+    // Delete a saved configuration
+    private void showDeleteDialog() {
+
+        if (isRunning) {
+            showMessage("Stop automation before deleting.");
+            return;
+        }
+
+        if (listener == null) {
+            return;
+        }
+
+        List<String> names = listener.getSavedConfigurations();
+
+        if (names == null || names.isEmpty()) {
+            showMessage("No saved configurations found.");
+            return;
+        }
+
+        String[] items = names.toArray(new String[0]);
+
+        AlertDialog dialog = new AlertDialog.Builder(service)
+                .setTitle("Select Configuration to Delete")
+                .setItems(items, (d, which) -> {
+
+                    if (isRunning) {
+                        showMessage("Stop automation before deleting.");
+                        return;
+                    }
+
+                    String selectedName = items[which];
+
+                    showDeleteConfirmation(selectedName);
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        configureDialogWindow(dialog);
+
+        dialog.show();
+    }
+
+
+    // Confirm before deleting
+    private void showDeleteConfirmation(String name) {
+
+        if (isRunning) {
+            showMessage("Stop automation before deleting.");
+            return;
+        }
+
+        AlertDialog dialog = new AlertDialog.Builder(service)
+                .setTitle("Delete Configuration")
+                .setMessage(
+                        "Are you sure you want to delete \""
+                                + name + "\"?"
+                )
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (d, which) -> {
+
+                    if (isRunning) {
+                        showMessage("Stop automation before deleting.");
+                        return;
+                    }
+
+                    if (listener != null) {
+                        listener.onDeleteRequested(name);
+                    }
+                })
+                .create();
+
+        configureDialogWindow(dialog);
+
+        dialog.show();
+    }
 
     private void configureDialogWindow(AlertDialog dialog) {
 

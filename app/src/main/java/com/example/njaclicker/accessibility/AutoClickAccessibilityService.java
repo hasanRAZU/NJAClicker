@@ -181,6 +181,11 @@ public class AutoClickAccessibilityService extends AccessibilityService {
                     public void onLoadRequested(String name) {
                         loadConfiguration(name);
                     }
+                    // DELETE CONFIGURATION
+                    @Override
+                    public void onDeleteRequested(String name) {
+                        deleteConfiguration(name);
+                    }
                 }
         );
 
@@ -275,6 +280,28 @@ public class AutoClickAccessibilityService extends AccessibilityService {
         updateFloatingPanelActions(markerManager.getActions());
 
         showMessage("Configuration loaded: " + name);
+    }
+
+    // DELETE A SAVED CONFIGURATION
+    private void deleteConfiguration(String name) {
+
+        if (automationController.isRunning()) {
+            showMessage("Stop automation before deleting.");
+            return;
+        }
+
+        if (automationStorage == null) {
+            showMessage("Storage is not initialized.");
+            return;
+        }
+
+        boolean deleted = automationStorage.deleteConfiguration(name);
+
+        if (deleted) {
+            showMessage("Configuration deleted: " + name);
+        } else {
+            showMessage("Unable to delete configuration.");
+        }
     }
 
     private void addTapMarker() {
