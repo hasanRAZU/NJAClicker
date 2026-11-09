@@ -18,8 +18,8 @@ public class AutomationAction {
     // Swipe duration
     private long swipeDurationMs = 500;
 
-    // Waiting time after this action
-    private long delayAfterMs = 1000;
+    // Default waiting time after each action
+    private long delayAfterMs = 2000;
 
     public AutomationAction(ActionType type) {
         this.type = type;
